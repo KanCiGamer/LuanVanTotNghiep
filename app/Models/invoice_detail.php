@@ -11,7 +11,7 @@ class invoice_detail extends Model
 
     protected $table = 'invoice_details';
     protected $primaryKey = 'id';
-    protected $fillable = ['invoice_id','showtime_id', 'seat_id','gia_tien',];
+    protected $fillable = ['invoice_id','showtime_id', 'seat_id','price',];
 
     public function invoice()
     {

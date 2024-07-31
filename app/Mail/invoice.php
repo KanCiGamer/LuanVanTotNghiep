@@ -12,13 +12,13 @@ use Illuminate\Queue\SerializesModels;
 class invoice extends Mailable
 {
     use Queueable, SerializesModels;
-
+    public $emailData;
     /**
      * Create a new message instance.
      */
-    public function __construct()
+    public function __construct($emailData)
     {
-        //
+        $this->emailData = $emailData;
     }
 
     /**
@@ -27,7 +27,7 @@ class invoice extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Invoice',
+            subject: 'Thông tin vé đã mua',
         );
     }
 
@@ -37,7 +37,7 @@ class invoice extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'view.name',
+            view: 'layouts.ticket_content',
         );
     }
 

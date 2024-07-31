@@ -25,10 +25,18 @@ class Users extends Authenticatable
         'user_password',
         'verification',
         'block',
-        'verification_token'
+        'verification_token',
+        'role_id'
+    ];
+    protected $casts = [
+        'user_id' => 'string',
     ];
     public function getAuthPassword()
     {
         return $this->user_password;
+    }
+    public function user_role()
+    {
+        return $this->hasOne(user_role::class, 'role_id');
     }
 }

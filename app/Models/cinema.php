@@ -18,6 +18,9 @@ class cinema extends Model
         'address',
     ];
 
+    protected $casts = [
+        'name' => 'string',        
+    ];
     public function cinema_rooms()
     {
         return $this->hasMany(cinema_room::class, 'cinema_id', 'cinema_id');

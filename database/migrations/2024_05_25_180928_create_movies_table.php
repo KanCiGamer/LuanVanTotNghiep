@@ -25,7 +25,7 @@ return new class extends Migration
         $table->integer('price')->nullable(false); 
         $table->boolean('status')->default(true);
         $table->unsignedBigInteger('age_rating_id')->nullable(false);
-        $table->foreign('age_rating_id')->references('age_rating_id')->on('age_ratings')->onDelete('cascade');
+        $table->foreign('age_rating_id')->references('age_rating_id')->on('age_ratings')->onDelete('cascade'); //restrict |set null
         $table->timestamps();
         });
     }

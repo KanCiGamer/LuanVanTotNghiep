@@ -16,6 +16,7 @@ return new class extends Migration
             $table->date('date_created')->nullable(false); // ngày tạo hóa đơn - không để trống
             $table->boolean('status')->nullable(false); // trạng thái hóa đơn (true: đã duyệt / false: chưa duyệt) - không để trống
             $table->string('email_kh',50)->nullable(false); //email người dùng - không để trống / trùng
+            $table->string('phone_kh',11)->nullable(false); //phone người dùng - không để trống / trùng
             $table->char('user_id',10)->nullable(); // cột mã khách hàng
             $table->foreign('user_id')->references('user_id')->on('users'); // liên kết mã đến bảng khách hàng (khóa ngoại)
 

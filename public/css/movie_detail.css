@@ -1,5 +1,104 @@
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h1 {
+    text-align: justify;
+    margin-bottom: 20px;
+}
+
+.movie-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+}
+
+.movie-poster {
+    width: 475px;
+}
+
+.movie-poster img {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+}
+
+.movie-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    text-align: left;
+    flex: 1;
+    line-height: 1.45;
+}
+
+.movie-details p {
+    margin-bottom: 5px;
+    font-size: 20px;
+}
+
+.movie-details strong {
+    font-weight: bold;
+}
+
+.center {
+    display: flex;
+    align-items: center;
+}
+
+.center svg {
+    margin-right: 10px;
+}
+
+.title {
+    font-size: 25px;
+}
+
+/* Lịch chiếu */
+.showtimes {
+    margin-top: 40px;
+}
+
+.showtimes h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.showtime-date {
+    display: inline-block;
+    margin-right: 20px;
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.showtime-date.active {
+    background-color: #f0f0f0;
+}
+
 .showtime-list {
     margin-top: 10px;
+    display: none;
+    /* Ẩn danh sách suất chiếu ban đầu */
+}
+
+.showtime-list.active {
+    display: block;
+    /* Hiển thị khi click vào ngày */
+}
+
+.show-time-list {
+    display: none;
+}
+
+/* Hiển thị .show-time-list khi có class 'active' */
+.show-time-list.active {
+    display: block;
+    /* Hoặc kiểu hiển thị khác: inline-block, flex,... */
 }
 
 .showtime-link {
@@ -17,34 +116,70 @@
     background-color: #007bff;
     color: #fff;
 }
+
+/* Ghế */
 .seat-map {
-    display: grid;
-    grid-template-columns: repeat(10, 1fr); /* Điều chỉnh số cột cho phù hợp */
+    /* display: grid; */
+    grid-template-columns: repeat(10, 1fr);
     gap: 5px;
+    margin-top: 20px;
 }
 
 .seat-row {
     display: flex;
-    justify-content: space-evenly;
+    justify-content: space-between;
     margin-bottom: 10px;
 }
 
 .seat {
-    /* width: 30px;  */
     padding: 8px;
-    /* height: 30px; */
-    background-color: lightgray;
-    border: 1px solid gray;
+    background-color: rgb(91, 156, 255);
+    border: 1px solid black;
     text-align: center;
     cursor: pointer;
-    border-radius: 5px; /* Bo tròn góc */
+    border-radius: 5px;
 }
 
 .seat.selected {
-    background-color: blue;
-    color: white;
+    background-color: yellow;
+    color: black;
 }
+
 .seat.sold {
-    background-color: red; 
-    cursor: not-allowed; 
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.seat.reserved {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.arc {
+    width: 80%;
+    /* Điều chỉnh độ rộng của vòng cung */
+    height: 20px;
+    /* Điều chỉnh độ cao của vòng cung */
+    border-radius: 50% / 100%;
+    /* Tạo hình dạng nửa vòng tròn */
+    border-bottom-left-radius: 0;
+    /* Loại bỏ bo tròn góc dưới bên trái */
+    border-bottom-right-radius: 0;
+    /* Loại bỏ bo tròn góc dưới bên phải */
+    background-color: #000000;
+    /* Màu nền của vòng cung */
+    margin: 20px auto;
+    /* Căn giữa vòng cung */
+    margin-bottom: 50px;
+}
+
+#pay-button {
+    margin-top: 40px;
+    padding: 10px;
+    background-color: #FF9F66;
+    border: none;
+}
+
+#pay-button:hover {
+    background-color: #FF5F00;
 }

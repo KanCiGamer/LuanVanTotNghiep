@@ -1,21 +1,85 @@
+/* Global styles */
+body {
+    background-color: #f4f4f4;
+}
+
+.container {
+    width: 100%;
+    padding: 0 20px;
+}
+
+#bannerCarousel .item{
+    width: 100%;
+    /* background-image: url('../images/banner/banner.png'); */
+    height: 500px;
+    background-size: cover;
+    background-position: center;
+}
+
+.content {
+    text-align: center;
+    display: flex;
+    justify-content: space-around;
+    justify-items: center;
+
+}
+
 .movie-container {
-    position: relative; /* Để đặt vị trí cho h3 */
+    position: relative;
+}
+
+.movie-container img {
+    width: 90%;
+    height: 100%;
+    display: block;
+}
+
+.movie-container .content-movie {
+    text-align: left;
+    font-size: 16px;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    bottom: 0;
+    left: 0;
+    display: none;
+    background-color: black;
+    color: white;
+    box-sizing: border-box;
+    padding: 10px;
+}
+
+.movie-container:hover .content-movie {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    opacity: 0.85;
+    /* align-items: center; */
 }
 
 .movie-title {
-    position: absolute; 
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%; 
-    background-color: rgba(255, 159, 102, 0.8); /* Màu nền mờ, có thể điều chỉnh */
-    display: flex;
-    align-items: center; /* Căn giữa theo chiều dọc */
-    justify-content: center; /* Căn giữa theo chiều ngang */
-    opacity: 0; /* Ẩn tên phim ban đầu */
-    transition: opacity 0.3s ease; /* Thêm hiệu ứng chuyển động mượt mà */
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    height: 40px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-.movie-container:hover .movie-title {
-    opacity: 1; /* Hiển thị tên phim khi hover */
+.infor-movie p {
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.infor-movie p svg {
+    margin-right: 10px;
+}
+
+@media (max-width: 768px) {
+    .movie-container {
+        width: 48%;
+        margin: 10px 1%;
+    }
 }

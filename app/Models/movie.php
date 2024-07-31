@@ -12,7 +12,6 @@ class movie extends Model
       // Sử dụng UUID thay cho ID mặc định
       protected $keyType = 'string';
       public $incrementing = false;
-  
       // Tên bảng
       protected $table = 'movies';
   
@@ -34,12 +33,14 @@ class movie extends Model
           'price',
           'status',
           'age_rating_id',
+          'total',
       ];
   
       // Các trường có kiểu dữ liệu đặc biệt
       protected $casts = [
           'movie_id' => 'string',
           'status' => 'boolean',
+          
       ];
 
     public function age_rating()
