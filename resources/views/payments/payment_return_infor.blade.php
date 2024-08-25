@@ -1,80 +1,45 @@
 @extends('layouts.home')
 
 @section('noi-dung')
-<div class="container">
-    <div class="header clearfix">
-        <h3 class="text-muted">VNPAY RESPONSE</h3>
-    </div>
-    <div class="table-responsive">
-        <div class="form-group">
-            <label>Mã đơn hàng:</label>
-            <label>{{ request()->get('vnp_TxnRef') }}</label>
-        </div>    
-        <div class="form-group">
-            <label>Số tiền:</label>
-            <label>{{ request()->get('vnp_Amount') }}</label>
-        </div>  
-        <div class="form-group">
-            <label>Nội dung thanh toán:</label>
-            <label>{{ request()->get('vnp_OrderInfo') }}</label>
-        </div> 
-        <div class="form-group">
-            <label>Mã phản hồi (vnp_ResponseCode):</label>
-            <label>{{ request()->get('vnp_ResponseCode') }}</label>
-        </div> 
-        <div class="form-group">
-            <label>Mã GD Tại VNPAY:</label>
-            <label>{{ request()->get('vnp_TransactionNo') }}</label>
-        </div> 
-        <div class="form-group">
-            <label>Mã Ngân hàng:</label>
-            <label>{{ request()->get('vnp_BankCode') }}</label>
-        </div> 
-        <div class="form-group">
-            <label>Thời gian thanh toán:</label>
-            <label>{{ request()->get('vnp_PayDate') }}</label>
-        </div> 
-        <div class="form-group">
-            <label>Kết quả:</label>
-            <label>
-                @php
-                    $inputData = request()->except('vnp_SecureHash');
-                    ksort($inputData);
-                    $hashData = "";
-                    $i = 0;
-                    foreach ($inputData as $key => $value) {
-                        if ($i == 1) {
-                            $hashData .= '&' . urlencode($key) . "=" . urlencode($value);
-                        } else {
-                            $hashData .= urlencode($key) . "=" . urlencode($value);
-                            $i = 1;
-                        }
+    <div class="container">
+            @php
+                $inputData = request()->except('vnp_SecureHash');
+                ksort($inputData);
+                $hashData = '';
+                $i = 0;
+                foreach ($inputData as $key => $value) {
+                    if ($i == 1) {
+                        $hashData .= '&' . urlencode($key) . '=' . urlencode($value);
+                    } else {
+                        $hashData .= urlencode($key) . '=' . urlencode($value);
+                        $i = 1;
                     }
-                    $secureHash = hash_hmac('sha512', $hashData, config('services.vnpay.hash_secret'));
-                @endphp
-
-                @if ($secureHash == request()->get('vnp_SecureHash'))
-                    @if (request()->get('vnp_ResponseCode') == '00')
-                        <span style='color:blue'>GD Thanh cong</span>
+                }
+                $secureHash = hash_hmac('sha512', $hashData, config('services.vnpay.hash_secret'));
+            @endphp
+            <div
+                style="display: flex; justify-content: center; align-items: center; margin: 40px auto;text-align:center; height: 65vh;">
+                <div>
+                    @if ($secureHash == request()->get('vnp_SecureHash'))
+                        @if (request()->get('vnp_ResponseCode') == '00')
+                        <h2 style="margin-bottom:20px;">THANH TOÁN THÀNH CÔNG</h2>
+                            <p>Vui lòng kiểm tra email của bạn để xem thông tin vé phim đã mua!</p>
+                            <div style="margin-top: 35px;">
+                                <a href="https://mail.google.com/mail" target="_blank"
+                                    style="padding: 25px;background: blanchedalmond;">MỞ EMAIL</a>
+                            </div>
+                        @else
+                        <h2 style="margin-bottom:20px;color:red;">THANH TOÁN KHÔNG THÀNH CÔNG</h2>
+                        @endif
                     @else
-                        <span style='color:red'>GD Khong thanh cong</span>
+                    <h2 style="margin-bottom:20px;color:red;">LỖI THANH TOÁN VUI LÒNG LIÊN HỆ QUẢN TRỊ VIÊN</h2>
                     @endif
-                @else
-                    <span style='color:red'>Chu ky khong hop le</span>
-                @endif
-            </label>
-        </div> 
-    </div>
-    <p>
-         
-    </p>
-    <footer class="footer">
-        <p>© VNPAY {{ date('Y') }}</p>
-    </footer>
-</div>
-@endsection
 
-{{-- @extends('layouts.home')
+                </div>
+            </div>
+    @endsection
+
+    {{-- @extends('layouts.home')
 
 @section('noi-dung')
     <div class="container">

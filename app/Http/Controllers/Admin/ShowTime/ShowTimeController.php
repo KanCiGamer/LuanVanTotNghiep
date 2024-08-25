@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\ShowTime;
 use App\Http\Controllers\Controller;
 use App\Models\cinema;
 use App\Models\cinema_room;
+use App\Models\invoice_detail;
 use App\Models\movie;
 use App\Models\show_time;
 use Illuminate\Http\Request;
@@ -44,16 +45,53 @@ class ShowTimeController extends Controller
      */
     public function store(Request $request)
     {
-        $show_time = new show_time();
-        $show_time->movie_id = $request->movie_id;
-        $show_time->cinema_room_id = $request->cinema_room_id;
+        // Lấy thông tin về phim
+    $movie = movie::find($request->movie_id);
+    $movie_time = $movie->time; // Giả sử 'duration' là số phút chiếu phim, kiểu int
 
-        // $show_time->start_time = request('start_time');
-        $show_time->start_date = $request->start_date;
-        $show_time->start_time = $request->start_time;
-        $show_time->save();
+    // Tính thời gian kết thúc của suất chiếu mới
+    $start_time = Carbon::parse($request->start_date . ' ' . $request->start_time);
+    $end_time = $start_time->copy()->addMinutes($movie_time + 15); // Thêm 15 phút dọn dẹp
 
-        return redirect()->back()->with('success', 'Suất chiếu đã được thêm thành công!');
+    // Kiểm tra xem có suất chiếu nào khác trong cùng rạp và phòng chiếu bị trùng giờ không
+    $conflicting_showtimes = show_time::where('cinema_room_id', $request->cinema_room_id)
+        ->where(function ($query) use ($start_time, $end_time, $movie_time) {
+            $query->where(function ($query) use ($start_time, $end_time) {
+                $query->where('start_date', $start_time->toDateString())
+                    ->whereTime('start_time', '<', $end_time->toTimeString())
+                    ->whereTime('start_time', '>=', $start_time->toTimeString());
+            })
+            ->orWhere(function ($query) use ($start_time, $end_time, $movie_time) {
+                $query->where('start_date', $start_time->toDateString())
+                    ->whereTime('start_time', '<', $start_time->toTimeString())
+                    ->whereRaw("DATE_ADD(start_time, INTERVAL ? MINUTE) > ?", [$movie_time + 15, $start_time->toTimeString()]);
+            });
+        })
+        ->exists();
+
+    if ($conflicting_showtimes) {
+        return redirect()->back()->with('error', 'Suất chiếu này trùng giờ với suất chiếu khác!');
+    }
+
+    // Nếu không có trùng lặp, tiến hành lưu suất chiếu mới
+    $show_time = new show_time();
+    $show_time->movie_id = $request->movie_id;
+    $show_time->cinema_room_id = $request->cinema_room_id;
+    $show_time->start_date = $request->start_date;
+    $show_time->start_time = $request->start_time;
+    $show_time->save();
+
+    return redirect()->back()->with('success', 'Suất chiếu đã được thêm thành công!');
+        // $show_time = new show_time();
+        // $show_time->movie_id = $request->movie_id;
+        // $show_time->cinema_room_id = $request->cinema_room_id;
+
+        // // $show_time->start_time = request('start_time');
+        // $show_time->start_date = $request->start_date;
+        // $show_time->start_time = $request->start_time;
+        // $show_time->save();
+        
+        // return redirect()->back()->with('success', 'Suất chiếu đã được thêm thành công!');
     }
 
     /**
@@ -96,6 +134,11 @@ class ShowTimeController extends Controller
     public function destroy($id)
     {
         $show_time = show_time::find($id);
+        $invoice_detail = invoice_detail::where('showtime_id', $id)->first();
+        if($invoice_detail!=null)
+        {
+            return redirect()->back()->with('error', 'Suất chiếu đã tồn tại hóa đơn! (không thể xóa)');
+        }
         if ($show_time) {
             $show_time->delete();
             return redirect()->back()->with('success', 'Suất chiếu đã được xóa thành công!');

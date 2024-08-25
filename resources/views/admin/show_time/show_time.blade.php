@@ -1,93 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.admin_home')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <style>
-        body {
-            margin: 0;
-            font-family: sans-serif;
-        }
-
-        .sidebar {
-            height: 100vh;
-            width: 200px;
-            background-color: #f0f0f0;
-            position: fixed;
-            left: 0;
-            top: 0;
-        }
-
-        .sidebar .profile {
-            text-align: center;
-            padding: 20px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .sidebar .profile img {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            margin-bottom: 10px;
-        }
-
-        .sidebar ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .sidebar li {
-            padding: 15px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .sidebar li a {
-            text-decoration: none;
-            color: #333;
-        }
-
-        .content {
-            margin-left: 200px;
-            padding: 20px;
-        }
-
-        .past-showtime {
-            background-color: #5f5f5f;
-        }
-    </style>
-</head>
-
-<body>
-    <div class="sidebar">
-        <div class="profile">
-            <i class="bi bi-person-circle"></i>
-            <h3>Administrator</h3>
-            <a href="#">Đăng xuất</a>
-        </div>
-        <ul>
-            <li><a href="{{ route('AdminPage') }}">Số liệu</a></li>
-            <li><a href="{{ route('ShowMovies') }}">Phim</a></li>
-            <li><a href="{{ route('ShowCategories') }}">Thể loại</a></li>
-            <li><a href="{{ route('ShowCinemas') }}">Rạp phim</a></li>
-            <li><a href="{{ route('ShowCinemaRoom') }}">Phòng chiếu</a></li>
-            <li><a href="{{ route('ShowSType') }}">Loại ghế</a></li>
-            <li><a href="{{ route('ShowSeat') }}">Ghế</a></li>
-            <li><a href="{{ route('ShowTime') }}">Suất chiếu</a></li>
-            <li><a href="{{ route('ShowUser')}}">Người dùng</a></li>
-            <li><a href="{{ route('ShowDiscount') }}">Mã giảm giá</a></li>
-            <li><a href="{{ route('ShowBanners') }}">Banner</a></li>
-        </ul>
-    </div>
-
-    <div class="content" id="content">
+@section('content')
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
@@ -119,11 +32,11 @@
                                         <th>Phòng chiếu</th>
                                         <th>Ngày bắt đầu</th>
                                         <th>Thời gian bắt đầu</th>
-                                        <th>Thao tác</th>
+                                        <th></th>
                                     </thead>
                                     <tbody>
                                         @foreach ($showtimes as $showtime)
-                                            <tr class="@if ($showtime->isPast) past-showtime @endif"> 
+                                            <tr class="@if($showtime->isPast)table-secondary @endif"> 
                                                 <td>{{ $showtime->showtime_id }}</td>
                                                 <td>{{ $showtime->movie->movie_name }}</td>
                                                 <td>{{ $showtime->cinema_room->cinema->name }}</td>
@@ -384,6 +297,4 @@
             }, 2000);
         });
     </script>
-</body>
-
-</html>
+@endsection

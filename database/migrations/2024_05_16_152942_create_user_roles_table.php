@@ -19,8 +19,12 @@ return new class extends Migration
         });
 
         DB::table('user_roles')->insert([
-            'role_id' => 0, 
-            'role_name' => 'user', 
+            // 'role_id' => 0, 
+            // 'role_name' => 'user', 
+            ['role_id' => 0, 
+            'role_name' => 'user'],
+            ['role_id' => 0, 
+            'role_name' => 'user'],
             // 'created_at' => now(), 
             // 'updated_at' => now(),
         ]);

@@ -87,7 +87,7 @@
                             <label class="text-success"><span>{{ session('successp') }}</span></label><br>
                         @endif
                     </div>
-                    <form action="{{route('UserUpdatePass', $user->user_id)}}" method="POST" id="update-pass">
+                    <form action="{{ route('UserUpdatePass', $user->user_id) }}" method="POST" id="update-pass">
                         @csrf
                         @method('PUT')
                         <div class="form-group">
@@ -109,7 +109,8 @@
                         <div class="form-group">
                             <label for="user_phone">Xác nhận mật khẩu:</label>
                             <input type="password" name="re_new_user_password" id="re_new_user_password" required>
-                            <div id="confirm-password-error" class="error" style="display:none; color:red;">Mật khẩu không
+                            <div id="confirm-password-error" class="error" style="display:none; color:red;">Mật khẩu
+                                không
                                 trùng
                                 khớp.</div>
                         </div>
@@ -117,12 +118,64 @@
                 <button type="submit">Cập nhật</button>
                 </form>
             </div>
+            <div class="content-section" id="user-tickets">
+                <h2>DANH SÁCH VÉ ĐÃ MUA</h2>
+                @if ($invoice == null)
+                    <p>Không có vé nào được tìm thấy.</p>
+                @else
+                    <ul class="cinema-list"
+                        style="list-style-type: none;display:flex;flex-direction:column;gap:10px;text-align:center; width:80%;">
+                        @foreach ($invoice as $value)
+                            <li>
+                                <div class="invoice-item"
+                                    style="display: flex; justify-content:space-between;align-items: center;
+                                    cursor: pointer;
+                                    padding: 24px;
+                                    border: 1px black solid;
+                                    margin-top: 20px;
+                                    text-align:left;"
+                                    onclick="toggleDetails(this)">
+                                    <div>
+                                        <span  style="color: #FF5F00;">{{ $value->invoice_detail[0]->showtime->movie->movie_name }} </span><br>
+                                        {{ $value->invoice_detail[0]->showtime->start_date }}
+                                    </div>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                        fill="currentColor" class="bi bi-caret-left-fill" viewBox="0 0 16 16">
+                                        <path
+                                            d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z" />
+                                    </svg>
+                                </div>
+                                <div class="invoice-details"
+                                    style="display: none; padding: 24px; border: 1px solid black; border-top:none; text-align:left; ">
+                                    <ul>
+                                        <p>Giờ chiếu: {{ $value->invoice_detail[0]->showtime->start_time }}</p>
+                                        <p>
+                                            Ghế:
+
+                                            @foreach ($value->invoice_detail as $detail)
+                                                {{ $detail->seat->seat_name }}
+                                            @endforeach
+                                        </p>
+                                        <p>Giá tiền: {{ number_format($value->price_total, 0, ',', '.') }} 
+                                            @if($value->discountCode)
+                                            VND (giảm: {{  $value->discountCode->discount_percentage}}%)
+                                            @else
+                                            VND
+                                            @endif
+                                        </p>
+                                        
+                                        {{-- <p>Mã giảm giá: {{ $value->discountCode->code ?? "không sử dụng"}}</p> --}}
+                                    </ul>
+                                </div>
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
+            </div>
+
         </div>
 
-        <div class="content-section" id="user-tickets">
-            <h2>Danh sách vé</h2>
-            {{--  Hiển thị danh sách vé đã mua --}}
-        </div>
+
     </div>
     </div>
 
@@ -142,6 +195,16 @@
                 targetSection.classList.add('active');
             });
         });
+
+        function toggleDetails(element) {
+            const details = element.nextElementSibling;
+            if (details.style.display === "none" || details.style.display === "") {
+                details.style.display = "block";
+            } else {
+                details.style.display = "none";
+            }
+        }
+
         $(document).ready(function() {
             setTimeout(function() {
                 $('.error-container').fadeOut('slow', function() {
@@ -191,11 +254,10 @@
                 if (confirmPasswordInput.value != passwordInput.value) {
                     confirmPasswordError.style.display = 'block';
                     event.preventDefault();
-                }
-                else{
+                } else {
                     confirmPasswordError.style.display = 'none';
                 }
-                
+
             });
             document.querySelectorAll("input[required]").forEach(function(input) {
                 input.addEventListener("invalid", function() {

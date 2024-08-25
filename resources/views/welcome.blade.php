@@ -13,7 +13,7 @@
         </div>
         <!------>
         <div>
-            <h1 style="margin-top: 20px; text-align:center;">PHIM ĐANG CHIẾU</h1>
+            <h1 style="margin-top: 50px; text-align:center; margin-bottom: 20px;color: #FF5F00;">PHIM ĐANG CHIẾU</h1>
             <div class="owl-carousel owl-theme content">
                 @foreach ($dangchieu as $movie)
                     <a href="{{ route('MovieDetail', ['id' => $movie->movie_id]) }}" class="movie-link">
@@ -60,15 +60,17 @@
                             </div>
                         </div>
                         <p
-                            style="margin-top:10px; font-weight: bold; overflow: hidden; text-overflow: ellipsis; text-align:center; line-height:1.8; font-size: 20px;display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; ">
+                            style="margin-top:10px; font-weight: bold; overflow: hidden; text-overflow: ellipsis; text-align:center; line-height:1.8; font-size: 20px;display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;color: #FF5F00; ">
                             {{ $movie->movie_name }}</p>
                     </a>
                 @endforeach
             </div>
-
+            <div class="more">
+                <a href="{{ route('showing')}}">XEM THÊM</a>
+            </div>
         </div>
         <div style="margin-top: 30px;">
-            <h1 style="margin-top: 20px; text-align:center;">PHIM SẮP CHIẾU</h1>
+            <h1 style="margin-top: 20px; text-align:center; margin-bottom: 20px;color: #FF5F00;">PHIM SẮP CHIẾU</h1>
             <div class="owl-carousel owl-theme content">
                 @foreach ($sapchieu as $movie)
                     <a href="{{ route('MovieDetail', ['id' => $movie->movie_id]) }}" class="movie-link">
@@ -115,10 +117,13 @@
                             </div>
                         </div>
                         <p
-                            style="margin-top:10px; font-weight: bold; overflow: hidden; text-overflow: ellipsis; text-align:center; line-height:1.8; font-size: 20px;display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; ">
+                            style="margin-top:10px; font-weight: bold; overflow: hidden; text-overflow: ellipsis; text-align:center; line-height:1.8; font-size: 20px;display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; color: #FF5F00;">
                             {{ $movie->movie_name }}</p>
                     </a>
                 @endforeach
+            </div>
+            <div  class="more">
+                <a  href="{{ route('upcoming')}}">XEM THÊM</a>
             </div>
         </div>
     </div>

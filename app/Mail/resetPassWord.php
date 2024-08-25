@@ -9,21 +9,17 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class invoice extends Mailable
+class resetPassWord extends Mailable
 {
     use Queueable, SerializesModels;
-    //public $emailData;
-    public $invoice;
-    public $invoiceDetails;
-    public $showtime;
+
+    public $verificationUrl;
     /**
      * Create a new message instance.
      */
-    public function __construct($invoice, $invoiceDetails, $showtime)
+    public function __construct($verificationUrl)
     {
-        $this->invoice = $invoice;
-        $this->invoiceDetails = $invoiceDetails;
-        $this->showtime = $showtime;
+        $this->verificationUrl = $verificationUrl;
     }
 
     /**
@@ -32,7 +28,7 @@ class invoice extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Thông tin vé đã mua',
+            subject: 'ĐẶT LẠI MẬT KHẨU TRÊN HỆ THỐNG',
         );
     }
 
@@ -42,7 +38,7 @@ class invoice extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'layouts.mail.ticket_content',
+            view: 'layouts.mail.reset_password',
         );
     }
 

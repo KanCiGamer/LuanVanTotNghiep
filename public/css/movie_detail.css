@@ -52,9 +52,12 @@ h1 {
 .center svg {
     margin-right: 10px;
 }
-
+h1{
+    color: #FF5F00;
+}
 .title {
     font-size: 25px;
+    color: #FF5F00;
 }
 
 /* Lịch chiếu */
@@ -74,10 +77,11 @@ h1 {
     border: 1px solid #ccc;
     border-radius: 5px;
     cursor: pointer;
+    background-color: #FFFAE6
 }
 
 .showtime-date.active {
-    background-color: #f0f0f0;
+    background-color: #FF5F00;
 }
 
 .showtime-list {
@@ -97,10 +101,34 @@ h1 {
 
 /* Hiển thị .show-time-list khi có class 'active' */
 .show-time-list.active {
+    padding: 24px;
+    border: 1px solid black;
     display: block;
+    border-top: none;
+    background-color: #FFFAE6;
     /* Hoặc kiểu hiển thị khác: inline-block, flex,... */
 }
+.cinema-item{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 24px;
+    border: 1px black solid;
+    margin-top: 20px;
+    background-color: #FFFAE6;
+}
+.cinema-item svg {
+    transition: transform 0.5s ease;
+}
 
+.cinema-item svg.rotated {
+    transform: rotate(-90deg);
+    transform-origin: center;
+}
+.cinema-item.active{
+    border-bottom: none;
+}
 .showtime-link {
     display: inline-block;
     margin: 5px;
@@ -113,8 +141,8 @@ h1 {
 }
 
 .showtime-link:hover {
-    background-color: #007bff;
-    color: #fff;
+    background-color: #FF5F00;
+    color: black;
 }
 
 /* Ghế */
@@ -141,7 +169,7 @@ h1 {
 }
 
 .seat.selected {
-    background-color: yellow;
+    background-color: #FF5F00;
     color: black;
 }
 
@@ -182,4 +210,24 @@ h1 {
 
 #pay-button:hover {
     background-color: #FF5F00;
+}
+.seat-legend{
+    margin-top: 20px;
+    /* display: flex; */
+}
+.legend-item{
+    display: flex;
+    margin-right: 20px;
+    align-items: center;
+}
+.legend-item .none{
+    
+    background-color: rgb(91, 156, 255);
+}
+.legend-item .sold{
+    background-color: #ccc;
+}
+.legend-item .seat{
+    margin-top: 10px;
+    margin-right: 10px;
 }

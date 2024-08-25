@@ -19,6 +19,10 @@ class SeatController extends Controller
         $seat_type = seat_type::all();
         $cinema_room = cinema_room::all();
         return view('admin.seat.seat', compact('seat','seat_type','cinema_room'));
+
+
+        // $cinemaRooms = cinema_room::with('seat.seat_type')->get();
+        // return view('admin.seat.seat', compact('cinemaRooms'));
     }
 
     /**
@@ -41,7 +45,6 @@ class SeatController extends Controller
         $seat->save();
 
         return redirect()->back()->with('success', 'Ghế đã được thêm thành công!');
-
     }
 
     /**
@@ -66,15 +69,13 @@ class SeatController extends Controller
     public function update(Request $request, $id)
     {
         $seat = seat::find($id);
-        if($seat){
+        if ($seat) {
             $seat->seat_name = $request->seat_name;
             $seat->seat_type_id = $request->seat_type_id;
             $seat->cinema_room_id = $request->cinema_room_id;
             $seat->save();
             return redirect()->back()->with('success', 'Ghế đã được sửa thành công!');
-            
-        }
-        else{
+        } else {
             return redirect()->back()->with('error', 'Không tìm thấy ghế!');
         }
     }
@@ -85,11 +86,10 @@ class SeatController extends Controller
     public function destroy($id)
     {
         $seat = seat::find($id);
-        if($seat){
-        $seat->delete();
-        return redirect()->back()->with('success', 'Ghế đã được xóa thành công!');
-        }
-        else{
+        if ($seat) {
+            $seat->delete();
+            return redirect()->back()->with('success', 'Ghế đã được xóa thành công!');
+        } else {
             return redirect()->back()->with('error', 'Không tìm thấy ghế!');
         }
     }

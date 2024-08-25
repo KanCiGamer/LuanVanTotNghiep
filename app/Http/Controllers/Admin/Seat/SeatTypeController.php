@@ -32,7 +32,7 @@ class SeatTypeController extends Controller
     {
         $seat_type = new seat_type();
         $seat_type->name = $request->seat_type_name;
-        $seat_type->price = $request->seat_type_price;
+        $seat_type->percentage = $request->seat_type_price;
         $seat_type->save();
         
         return redirect()->back()->with('success', 'Loại ghế đã được thêm thành công!');
@@ -64,7 +64,7 @@ class SeatTypeController extends Controller
         if($seat_type)
         {
             $seat_type->name = $request->seat_type_name;
-            $seat_type->price = $request->seat_type_price;
+            $seat_type->percentage = $request->seat_type_price;
             $seat_type->save();
             return redirect()->back()->with('success', 'Loại ghế đã được cập nhật thành công!');
         }

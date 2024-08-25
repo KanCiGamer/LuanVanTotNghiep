@@ -61,16 +61,31 @@ class DiscountCodeController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, discount_code $discount_code)
+    public function update(Request $request, $id)
     {
-        //
+        $discount = discount_code::find($id);
+        if ($discount) {
+            $discount->code = $request->input('code');
+            $discount->discount_percentage = $request->input('discount_percentage');
+            $discount->expiry_date = $request->input('expiry_date');
+            $discount->save();
+            return redirect()->back()->with('success', 'Mã đã được cập nhật thành công!');
+        } else {
+            return redirect()->back()->with('error', 'Mã không tồn tại!');
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(discount_code $discount_code)
+    public function destroy($id)
     {
-        //
+        $disco = discount_code::findOrFail($id);
+        if ($disco) {
+            $disco->delete();
+            return redirect()->back()->with('success', 'Mã đã được xóa thành công!');
+        } else {
+            return redirect()->back()->with('error', 'Lỗi khi xóa mã giảm giá!');
+        }
     }
 }

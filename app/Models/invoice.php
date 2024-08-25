@@ -32,10 +32,14 @@ class invoice extends Model
 
     public function discountCode()
     {
-        return $this->belongsTo(discount_code::class, 'discount_code_id', 'discount_code_id');
+        return $this->belongsTo(discount_code::class, 'discount_code_id');
     }
     public function invoice_detail()
     {
         return $this->hasMany(invoice_detail::class,'invoice_id','invoice_id');
+    }
+    public function discount_use()
+    {
+        return $this->hasMany(discount_use::class, 'invoice_id', 'invoice_id');
     }
 }

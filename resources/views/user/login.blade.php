@@ -3,12 +3,27 @@
 @section('noi-dung')
     <link rel="stylesheet" href="{{ asset('css/loginpage.css') }}">
     <div class="container">
+        {{-- <div class="error-container">
+            @if ($errors->has('error_phone'))
+                <label class="text-danger"><span>{{ $errors->first('error_phone') }}</span></label><br>
+            @endif
+        </div>
+        <div class="error-container">
+            @if ($errors->has('error_email'))
+                <label class="text-danger"><span>{{ $errors->first('error_email') }}</span></label><br>
+            @endif
+        </div>
+        <div class="error-container">
+            @if ($errors->has('error'))
+                <label class="text-danger"><span>{{ $errors->first('error') }}</span></label><br>
+            @endif
+        </div> --}}
         <div class="form-box">
             <div class="button-box">
                 <button type="button" class="toggle-btn" onclick="login()">ĐĂNG NHẬP</button>
                 <button type="button" class="toggle-btn" onclick="register()">ĐĂNG KÝ</button>
             </div>
-            <form action="{{ route('UserLogin') }}" method="POST" id="login" class="input-group">
+            <form action="{{ route('UserLogin') }}" method="POST" id="login" class="input-group" style="{{ $errors->has('error_phone') || $errors->has('error_email') ? 'display: none;' : 'display: block;' }}">
                 @csrf
                 <div class="container-form">
                     <div class="error-container">
@@ -24,13 +39,12 @@
                     <input type="password" id="login_user_password" name="user_password" required
                         title="Mật khẩu tài khoản">
                     <label>
-                        <a href="" style="font-size: 15px;">Quên mật khẩu?</a>
+                        <a href="{{route('ForgotPassword')}}" style="font-size: 15px;">Quên mật khẩu?</a>
                     </label>
                     <button type="submit">ĐĂNG NHẬP</button>
                 </div>
             </form>
-            <form action="{{ route('UserRegister') }}" method="POST" id="register" class="input-group"
-                style="display:none;">
+            <form action="{{ route('UserRegister') }}" method="POST" id="register" class="input-group" style="{{ $errors->has('error_phone') || $errors->has('error_email') ? 'display: block;' : 'display: none;' }}">
                 @csrf
                 <div class="container-form">
                     <label for="user_name">Họ và tên <span>*</span></label><br>

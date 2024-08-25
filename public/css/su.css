@@ -1,0 +1,220 @@
+.owl-carousel .owl-item img {
+    display: block;
+    width: 100%;
+}
+
+.owl-carousel .owl-stage {
+    position: relative;
+    -ms-touch-action: pan-Y;
+    touch-action: manipulation;
+    /* -moz-backface-visibility: hidden; */
+}
+
+.owl-stage {
+    transform: translate3d(-1231px, 0px, 0px);
+    transition: 1s;
+    width: 4926px;
+}
+
+/* Global styles */
+body {
+    background-color: white;
+}
+
+.container {
+    width: 100%;
+    padding: 0 20px;
+}
+
+#bannerCarousel .item {
+    width: 100%;
+    /* background-image: url('../images/banner/banner.png'); */
+    height: 500px;
+    background-size: cover;
+    background-position: center;
+}
+
+.content {
+    text-align: center;
+    justify-content: space-around;
+    justify-items: center;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20p
+}
+
+.movie-container {
+    position: relative;
+}
+
+.movie-container img {
+    width: 95%;
+    height: 100%;
+    display: block;
+}
+
+.movie-container .content-movie {
+    text-align: left;
+    font-size: 16px;
+    position: absolute;
+    width: 95%;
+    height: 100%;
+    bottom: 0;
+    left: 0;
+    display: none;
+    background-color: black;
+    color: white;
+    box-sizing: border-box;
+    padding: 10px;
+}
+
+.owl-carousel a {
+    width: 100%;
+    margin-bottom: 2.4rem;
+}
+
+a .title {
+    margin-top: 10px;
+    font-weight: bold;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+    line-height: 1.8;
+    font-size: 20px;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    color: #FF5F00;
+}
+
+.movie-container:hover .content-movie {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    opacity: 0.85;
+    /* align-items: center; */
+}
+
+.movie-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    height: 40px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.infor-movie p {
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.infor-movie p svg {
+    margin-right: 10px;
+}
+
+.more {
+    text-align: center;
+    margin-top: 15px;
+    margin-bottom: 150px;
+}
+
+.more a {
+    font-size: 20px;
+    font-weight: bold;
+    color: #002379;
+    padding: 10px 20px;
+    border: 1px solid #002379;
+    background-color: #FF9F66;
+}
+
+.more a:hover {
+    border: 1px solid #002379;
+    background-color: #FF5F00;
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .movie-container {
+        width: 48%;
+        margin: 10px 1%;
+    }
+}
+
+@media screen and (max-width: 1024px) {
+    .movie-container img {
+        width: 95%;
+        height: 100%;
+        display: block;
+    }
+
+    .movie-container .content-movie {
+        text-align: left;
+        font-size: 16px;
+        position: absolute;
+        width: 95%;
+        height: 100%;
+        bottom: 0;
+        left: 0;
+        display: none;
+        background-color: black;
+        color: white;
+        box-sizing: border-box;
+        padding: 10px;
+    }
+    a .title {
+        margin-top: 10px;
+        font-weight: bold;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-align: center;
+        line-height: 1.8;
+        font-size: 20px;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        color: #FF5F00;
+    }
+}
+@media screen and (max-width: 765px) {
+    .movie-container {
+        width: 100%;
+        margin: 10px 1%;
+    }
+    .movie-container img {
+        width: 95%;
+        height: 100%;
+        display: block;
+    }
+
+    .movie-container .content-movie {
+        text-align: left;
+        font-size: 16px;
+        position: absolute;
+        width: 95%;
+        height: 100%;
+        bottom: 0;
+        left: 0;
+        display: none;
+        background-color: black;
+        color: white;
+        box-sizing: border-box;
+        padding: 10px;
+    }
+    a .title {
+        
+        margin-top: 10px;
+        font-weight: bold;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-align: center;
+        line-height: 1.8;
+        font-size: 18px;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        color: #FF5F00;
+    }
+}

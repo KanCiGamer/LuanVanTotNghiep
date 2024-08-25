@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\movie;
 use App\Models\Categories;
 use App\Models\Age_rating;
+use App\Models\invoice_detail;
+use App\Models\show_time;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
@@ -71,6 +73,10 @@ class MovieController extends Controller
         $movie->save();
         if ($request->has('categories')) {
             $movie->categories()->attach($request->categories);
+        }
+        else
+        {
+            return redirect()->back()->with('error', 'Phim không được thêm thành công! (thiếu thể loại)');
         }
         //$movie->categories()->attach($request->input('categories', []));
 
@@ -139,8 +145,16 @@ class MovieController extends Controller
     public function destroy($id)
     {
         $movie = Movie::find($id);
+        $showtime = show_time::where('movie_id', $movie->movie_id)->first();
+        $invoice_detail = invoice_detail::where('showtime_id', $showtime->showtime_id)->first();
+        //dd($invoice_detail);
+        if($invoice_detail)
+        {
+            return redirect()->back()->with('error', 'Phim đã có hóa đơn không thể xóa!');
+        }
         if($movie)
         {
+
             $movie->delete();
             return redirect()->back()->with('success', 'Phim đã được xóa thành công!');
         }

@@ -10,16 +10,19 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use App\Mail\VerifyEmail;
 use App\Http\Controllers\Controller;
+use App\Mail\resetPassWord;
+use App\Models\invoice;
 use Illuminate\Support\Facades\Hash;
 
 class UsersController extends Controller
 {
     public function register(Request $rq)
     {
+        
         $rq->validate([
             'user_name' => 'required',
-            'user_phone' => 'required|unique:users',
-            'user_email' => 'required|email|unique:users',
+            // 'user_phone' => 'required|unique:users',
+            // 'user_email' => 'required|email|unique:users',
             'user_gender' => 'required',
             'user_date_of_birth' => 'required|date',
             'user_password' => 'required|min:8',
@@ -58,6 +61,7 @@ class UsersController extends Controller
             //Auth::guard('users')->login($user);
             return redirect()->route('VerifyNotify');
         }
+        
     }
 
     public function login(Request $rq)
@@ -75,7 +79,17 @@ class UsersController extends Controller
                 return redirect()->route('VerifyNotify');
             } else if (Auth::guard('users')->attempt(['user_email' => $account, 'password' => $password])) {
                 if (Auth::guard('users')->user()->role_id == 0) {
-                    return redirect()->route('home');
+                    if(Auth::guard('users')->user()->block == 1)
+                    {
+                        return redirect('/login')->withErrors([
+                            'error' => 'Tài khoản bị khóa',
+                        ]);
+                    }
+                    else
+                    {
+                        return redirect()->route('home');
+                    }
+                    
                 } else if (Auth::guard('users')->user()->role_id == 5) {
                     return redirect()->route('AdminPage');
                 }
@@ -93,7 +107,13 @@ class UsersController extends Controller
                 ]);
             } else if (!$user->verification) {
                 return redirect()->route('VerifyNotify');
-            } else if (Auth::guard('users')->attempt(['user_phone' => $account, 'password' => $password])) {
+            } else if(!$user->block)
+            {
+                return redirect('/notify')->withErrors([
+                    'error' => 'Tài khoản bị khóa',
+                ]);
+            } 
+            else if (Auth::guard('users')->attempt(['user_phone' => $account, 'password' => $password])) {
                 if (Auth::guard('users')->user()->role_id == 0) {
                     return redirect()->route('home');
                 } else if (Auth::guard('users')->user()->role_id == 5) {
@@ -146,7 +166,9 @@ class UsersController extends Controller
     public function show($id)
     {
         $user = Users::findOrFail($id);
-        return view('user.user', compact('user'));
+        $invoice = $user->invoice;
+        //dd($invoice);
+        return view('user.user', compact('user', 'invoice'));
     }
 
     /**
@@ -212,8 +234,60 @@ class UsersController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Users $users)
+    public function showRSPassWord()
     {
-        //
+        return view('user.rspassword');
+    }
+    public function SendMailRSPassWord(Request $rq)
+    {
+        $email = $rq->input('user_email');
+        $user = Users::where('user_email', $email)->first();
+        //dd($user);
+        if($user)
+        {
+            $token = Str::random(255);
+            $user->verification_token = $token;
+            $user->save();
+            $verificationUrl = url('/rs-password/' . $token);
+            Mail::to($user->user_email)->send(new resetPassWord($verificationUrl));
+            return back()->with('message', 'Chúng tôi đã gửi email đặt lại mật khẩu. Vui lòng kiểm tra hộp thư đến của bạn.');
+        }
+       else{
+        return back()->with('message', 'Tài khoản không tồn tại');
+       }
+    }
+    public function verifyRePass($token)
+    {
+        $user = Users::where('verification_token', $token)->first();
+
+        if ($user) {
+            return view('user.set_password', ['user' => $user, 'token' => $token]); 
+        } else {
+            return redirect()->route('VerifyNotify')->with('error', 'Có lỗi xảy ra khi đặt lại mật khẩu');
+        }
+    }
+    public function rePass(Request $request)
+    {
+        $user = Users::where('user_id', $request->input('user_id'))->first();
+        if($user)
+        {
+            $user->user_password = bcrypt($request->user_password);
+            $user->save();
+            return redirect()->route('UserLogin')->with('success', 'Đổi mật khẩu tài khoản thành công!');
+        }else{
+            return back()->with('message', 'Lỗi khi cập nhật mật khẩu.');
+        }
+    }
+    public function verifyToken($token)
+    {
+        $user = Users::where('verification_token', $token)->first();
+
+        if ($user) {
+            $user->verification = true;
+            $user->save();
+            return redirect()->route('UserLogin')->with('success', 'Xác minh tài khoản thành công!');
+        } else {
+            return redirect()->route('VerifyNotify')->with('error', 'Xác minh thất bại!');
+        }
     }
 }

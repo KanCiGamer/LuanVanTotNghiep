@@ -1,106 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.admin_home')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Quản lý Phim</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <style>
-        body {
-            margin: 0;
-            font-family: sans-serif;
-        }
-
-        .sidebar {
-            height: 100vh;
-            width: 200px;
-            background-color: #f0f0f0;
-            position: fixed;
-            left: 0;
-            top: 0;
-        }
-
-        .sidebar .profile {
-            text-align: center;
-            padding: 20px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .sidebar .profile img {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            margin-bottom: 10px;
-        }
-
-        .sidebar ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .sidebar li {
-            padding: 15px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .sidebar li a {
-            text-decoration: none;
-            color: #333;
-        }
-
-        .content {
-            margin-left: 200px;
-            padding: 20px;
-        }
-
-        .expandable {
-            transition: height 0.3s ease;
-            height: auto;
-        }
-
-        .expandable:hover {
-            height: auto;
-        }
-
-        .more-info {
-            display: none;
-        }
-
-        .expandable:hover .more-info {
-            display: block;
-        }
-    </style>
-</head>
-
-<body>
-    <div class="sidebar">
-        <div class="profile">
-            <i class="bi bi-person-circle"></i>
-            <h3>Administrator</h3>
-            <a href="#">Đăng xuất</a>
-        </div>
-        <ul>
-            <li><a href="{{ route('AdminPage') }}">Số liệu</a></li>
-            <li><a href="{{ route('ShowMovies') }}">Phim</a></li>
-            <li><a href="{{ route('ShowCategories') }}">Thể loại</a></li>
-            <li><a href="{{ route('ShowCinemas') }}">Rạp phim</a></li>
-            <li><a href="{{ route('ShowCinemaRoom') }}">Phòng chiếu</a></li>
-            <li><a href="{{ route('ShowSType') }}">Loại ghế</a></li>
-            <li><a href="{{ route('ShowSeat') }}">Ghế</a></li>
-            <li><a href="{{ route('ShowTime') }}">Suất chiếu</a></li>
-            <li><a href="{{ route('ShowUser')}}">Người dùng</a></li>
-            <li><a href="{{ route('ShowDiscount') }}">Mã giảm giá</a></li>
-            <li><a href="{{ route('ShowBanners') }}">Banner</a></li>
-        </ul>
-    </div>
-
-    <div class="content" id="content">
+@section('content')
 
         <h1 style="text-align: center;">QUẢN LÝ PHIM</h1>
         <div class="container" style="margin-top: 30px;">
@@ -108,7 +8,17 @@
                 <button type="button" class="btn btn-primary mb-3" data-toggle="modal" data-target="#addModal"><i
                         class="bi bi-plus"></i> Thêm</button>
             </div>
+            @if (session('success'))
+                <div class="alert alert-success">
+                    {{ session('success') }}
+                </div>
+            @endif
 
+            @if (session('error'))
+                <div class="alert alert-danger">
+                    {{ session('error') }}
+                </div>
+            @endif
             <div class="row">
                 @foreach ($movies as $movie)
                     <div class="col-md-3 mb-4">
@@ -120,9 +30,15 @@
                                     style="font-size: 18px; font-weight: bold; margin-bottom: 10px; height: 30px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                     {{ $movie->movie_name }}</h5>
                                 <p class="card-text">
-                                <p style="margin-bottom: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><strong>Đạo diễn:</strong> {{ $movie->directors }}</p>
-                                <p style="margin-bottom: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><strong>Diễn viên:</strong> {{ $movie->actor }}</p>
-                                <p style="margin-bottom: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><strong>Thể loại:</strong>
+                                <p
+                                    style="margin-bottom: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                    <strong>Đạo diễn:</strong> {{ $movie->directors }}</p>
+                                <p
+                                    style="margin-bottom: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                    <strong>Diễn viên:</strong> {{ $movie->actor }}</p>
+                                <p
+                                    style="margin-bottom: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                    <strong>Thể loại:</strong>
                                     @foreach ($movie->categories as $category)
                                         <span class="badge badge-secondary">{{ $category->category_name }}</span>
                                     @endforeach
@@ -160,7 +76,7 @@
                                         style="display: inline;">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm">Xóa</button>
+                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có muốn xóa không?');">Xóa</button>
                                     </form>
                                 </div>
                             </div>
@@ -444,20 +360,18 @@
             //     card.querySelector('.more-info').style.display = 'none';
             //     card.style.height = 'auto';
             // });
-            card.addEventListener('click',()=>{
+            card.addEventListener('click', () => {
                 const moreInfo = card.querySelector('.more-info');
 
-// Kiểm tra xem .more-info đang ẩn hay hiện
-if (moreInfo.style.display === 'block') {
-  moreInfo.style.display = 'none';
-  card.style.height = 'auto'; // Đặt lại chiều cao tự động
-} else {
-  moreInfo.style.display = 'block';
-  card.style.height = card.scrollHeight + 'px'; // Đặt chiều cao dựa trên nội dung
-}
+                // Kiểm tra xem .more-info đang ẩn hay hiện
+                if (moreInfo.style.display === 'block') {
+                    moreInfo.style.display = 'none';
+                    card.style.height = 'auto'; // Đặt lại chiều cao tự động
+                } else {
+                    moreInfo.style.display = 'block';
+                    card.style.height = card.scrollHeight + 'px'; // Đặt chiều cao dựa trên nội dung
+                }
             });
         });
     </script>
-</body>
-
-</html>
+@endsection

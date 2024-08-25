@@ -31,6 +31,9 @@ Route::get('/movies/search', [HomeController::class, 'search'])->name('Search');
 //filter
 Route::get('/filter', [HomeController::class, 'filter'])->name('Filter');
 
+Route::get('/showing', [HomeController::class, 'showing'])->name('showing');
+Route::get('/upcoming', [HomeController::class, 'upcoming'])->name('upcoming');
+
 Route::get('/movie/{id}', [HomeController::class,'MovieDetail'])->name('MovieDetail');
 Route::get('/showtimes/{movieId}/{date}', [HomeController::class, 'getCinemaShowtimesByDate']);
 Route::get('/showtimedetail/{id}', [HomeController::class,'ShowTimeDetail'])->name('ShowTimeSeat');
@@ -54,23 +57,17 @@ Route::put('/users/{id}', [UsersController::class, 'updateInfor'])->name('UserUp
 Route::put('/users/{id}/update', [UsersController::class, 'updatePassword'])->name('UserUpdatePass');
 // chức năng đăng ký, đăng nhập và đăng xuất
 Route::post('/register', [UsersController::class, 'register'])->name('UserRegister');
+Route::get('/verify/{token}', [UsersController::class, 'verifyToken'])->name('VerifyUser');
+
 Route::post('/login', [UsersController::class, 'login'])->name('UserLogin');
 Route::post('/logout', [UsersController::class, 'logout'])->name('UserLogout');
+//
+Route::get('/forgot-password', [UsersController::class, 'showRSPassWord'])->name('ForgotPassword');
+Route::post('/forgot-password', [UsersController::class, 'SendMailRSPassWord'])->name('SendMailForgotPassword');
+Route::get('/rs-password/{token}', [UsersController::class, 'verifyRePass'])->name('RePassUser');
+Route::post('/rs-password', [UsersController::class, 'rePass'])->name('UserRePass');
 
 
-
-Route::get('/verify/{token}', function ($token) {
-    $user = Users::where('verification_token', $token)->first();
-
-    if ($user) {
-        $user->verification = true;
-        $user->save();
-
-        return redirect()->route('UserLogin')->with('success', 'Xác minh tài khoản thành công!');
-    } else {
-        return redirect()->route('VerifyNotify')->with('error', 'Xác minh thất bại!');
-    }
-})->name('VerifyUser');
 
 
 Route::middleware('CheckUserRole')->prefix('admin')->group(function(){
@@ -135,5 +132,6 @@ Route::middleware('CheckUserRole')->prefix('admin')->group(function(){
    //discount
    Route::get('/discount', [DiscountCodeController::class, 'index'])->name('ShowDiscount');
    Route::post('/discount', [DiscountCodeController::class, 'store'])->name('AddDiscount');
+   Route::put('/discount/{id}', [DiscountCodeController::class, 'update'])->name('UpdateDiscount');
+   Route::delete('/discount/{id}', [DiscountCodeController::class, 'destroy'])->name('DeleteDiscount');
 });
-

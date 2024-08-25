@@ -13,8 +13,9 @@
         <p><strong>Phòng:</strong> {{ $data['cinema_room']->cinema_room_name }}</p>
         <p><strong>Địa chỉ:</strong> {{ $data['cinema']->address }}</p>
         <p><strong>Ghế đã chọn:</strong>
-            @foreach (session('ticket.seats') as $seat)
-                {{ $seat }}@if (!$loop->last)
+            @foreach ($seat as $value)
+                {{ $value }}
+                @if (!$loop->last)
                     ,
                 @endif
             @endforeach
@@ -32,8 +33,20 @@
         <form id="payment-form" method="POST" action="{{ route('Payment') }}">
             @csrf
             @if (Auth::guard('users')->check())
+                <input type="hidden" name="user_id" value="{{ Auth::guard('users')->user()->user_id }}">
                 <input type="hidden" name="email" value="{{ Auth::guard('users')->user()->user_email }}">
                 <input type="hidden" name="phone" value="{{ Auth::guard('users')->user()->user_phone }}">
+                <div class="form-group">
+                    <label for="discount_code">Mã giảm giá (nếu có):</label>
+                    <input type="text" class="form-control" id="discount_code" name="discount_code">
+                    @if ($errors->any())
+                        <div id="alert" style="margin-top: 10px;">
+                            @foreach ($errors->all() as $error)
+                                <p style="color: red;">{{ $error }}</p>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
             @else
                 <div class="form-group">
                     <label for="email">Email:</label>   
@@ -42,17 +55,7 @@
                     <input type="text" class="form-control" id="phone" name="phone" required>
                 </div>
             @endif
-            <div class="form-group">
-                <label for="discount_code">Mã giảm giá (nếu có):</label>
-                <input type="text" class="form-control" id="discount_code" name="discount_code">
-                @if ($errors->any())
-                    <div id="alert" style="margin-top: 10px;">
-                        @foreach ($errors->all() as $error)
-                            <p style="color: red;">{{ $error }}</p>
-                        @endforeach
-                    </div>
-                @endif
-            </div>
+           
             <button type="submit" class="btn btn-success mt-3">Xác nhận thanh toán</button>
         </form>
     </div>

@@ -143,7 +143,10 @@ class HomeController extends Controller
 
         // Perform the search
         $movies = Movie::where('movie_name', 'like', '%' . $query . '%')->get();
-
+        if(sizeof($movies)==0)
+        {
+            $movies=null;
+        }
         return view('movie.movie_search', compact('movies'));
     }
     public function filter(Request $request)
@@ -158,20 +161,44 @@ class HomeController extends Controller
             'night' => ['22:00:00', '23:59:59']
         ];
 
-        $query = show_time::query(); // Thay thế bằng mô hình của bạn
-
+        $query = show_time::query();
+        //dd($query);
+        $currentDate = Carbon::now();
+        $futureShowTimes = show_time::where('start_date', '>=', $currentDate->toDateString());
+       // dd($futureShowTimes);
         if ($startTime != 'all') {
             if (isset($timeMapping[$startTime])) {
                 $start = $timeMapping[$startTime][0];
                 $end = $timeMapping[$startTime][1];
-
-                $query->whereBetween('start_time', [$start, $end]);
+                //dd($start);
+                $futureShowTimes->whereBetween('start_time', [$start, $end]);
+                //dd($futureShowTimes);
+                
+                //dd($query);
             }
         }
-
-        $showtimes = $query->get();
-
-        return view('movie.movie_filter', compact('showtimes'));
+        //dd(is_array($futureShowTimes->get()));
+        //dd($startTime);
+        $showtimes = $futureShowTimes->get();
+        
+        //dd(is_object($showtimes));
+        //dd($showtimes);
+        $movie_id = [];
+        for($test = 0; $test<sizeof($showtimes);$test++)
+        {
+            $movie_id[$showtimes[$test]['movie_id']]= "test";
+            //dd($movie_id[0]);,'movie_id'
+        }
+        if(sizeof($showtimes)==0)
+        {
+            $showtimes = null;
+        }
+        // if(!is_array($futureShowTimes))
+        // {
+        //     $showtimes = null;
+        // }
+        //dd($movie_id);
+        return view('movie.movie_filter', compact('showtimes', 'movie_id'));
     }
     public function getCinemasByDate($movieId, $date)
     {
@@ -213,5 +240,26 @@ class HomeController extends Controller
             ->get();
 
         return response()->json($cinemas);
+    }
+    public function showing()
+    {
+
+        $movies = movie::all();
+        $dangchieu = movie::where('status', 1)->get();
+        //$sapchieu = movie::where('status', 0)->get();
+        // $dangchieu = movie::where('status',1)->paginate(4);
+        // $sapchieu = movie::where('status',0)->paginate(4);
+       // $banner = banners::all();
+        return view('movie.showing', compact('dangchieu'));
+    }
+    public function upcoming()
+    {
+        $movies = movie::all();
+        //$dangchieu = movie::where('status', 1)->get();
+        $sapchieu = movie::where('status', 0)->get();
+        // $dangchieu = movie::where('status',1)->paginate(4);
+        // $sapchieu = movie::where('status',0)->paginate(4);
+        //$banner = banners::all();
+        return view('movie.upcoming', compact( 'sapchieu'));
     }
 }

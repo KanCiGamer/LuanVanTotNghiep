@@ -17,6 +17,7 @@ class Users extends Authenticatable
     public $timestamps = false;
 
     protected $fillable = [
+        'user_id',
         'user_name',
         'user_phone',
         'user_email',
@@ -38,5 +39,12 @@ class Users extends Authenticatable
     public function user_role()
     {
         return $this->hasOne(user_role::class, 'role_id');
+    }
+    public function discount_use(){
+        return $this->hasMany(discount_use::class, 'user_id', 'user_id');
+    }
+    public function invoice()
+    {
+        return $this->hasMany(invoice::class, 'user_id', 'user_id');
     }
 }

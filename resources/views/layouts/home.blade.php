@@ -19,7 +19,7 @@
             margin: 0px;
             padding: 0px;
             box-sizing: border-box;
-            font-family: 'Courier New', Courier, monospace;
+            font-family: "Anton", sans-serif;
         }
 
         .menu input[type=text] {
@@ -40,7 +40,7 @@
         }
 
         a:hover {
-            color: #FF5F00;
+            color: #f9f9f9;
         }
 
         .dropdown-content {
@@ -68,9 +68,9 @@
         }
 
         .filter-button {
-            background-color: #FF5F00;
+            background-color: #FFFAE6;
             /* Màu nền cho nút lọc */
-            color: white;
+            color: black;
             /* Màu chữ */
             border-radius: 5px;
             /* Bo góc nút */
@@ -84,13 +84,13 @@
         }
 
         .filter-button:hover {
-            background-color: #e64a19;
+            background-color: #f9f9f9;
             /* Màu nền khi hover */
         }
 
         /* CSS cho footer */
         .footer {
-            background-color: #FFFAE6;
+            background-color: #FF5F00;
             padding: 30px 0;
             margin-top: 30px;
             /* Tạo khoảng cách với nội dung chính */
@@ -133,7 +133,7 @@
 </head>
 
 <body>
-    <div class="navbar2" style="background-color: #FFFAE6; padding: 25px;">
+    <div class="navbar2" style="background-color: #FF5F00; padding: 25px; ">
         <div class="content" style="display: flex; align-items:center; justify-content: space-between;">
             <div class="logo">
                 <a href="{{ route('home') }}">
@@ -153,12 +153,12 @@
                         <form action="{{route('Filter')}}" method="GET">
                             <!-- Thêm các tùy chọn lọc ở đây -->
                             <label for="category">Thời gian:</label>
-                            <select name="category" id="category">
+                            <select name="start_time" id="category">
                                 <option value="all">Tất cả</option>
-                                <option value="morning">Sáng</option>
-                                <option value="afternoon">Chiều</option>
-                                <option value="evening">Tối</option>
-                                <option value="night">Đêm</option>
+                                <option value="morning">06:00 - 11:59</option>
+                                <option value="afternoon">12:00 - 17:59</option>
+                                <option value="evening">18:00 - 21:59</option>
+                                <option value="night">22:00 - 23:59</option>
                             </select>
                             <button type="submit"
                                 style="margin-top: 10px; padding: 10px; background-color: #FF5F00; color: white; border: none; border-radius: 5px;">Áp
@@ -219,6 +219,7 @@
                     <li><a href="#">Câu hỏi thường gặp</a></li>
                     <li><a href="#">Hướng dẫn đặt vé</a></li>
                     <li><a href="#">Phương thức thanh toán</a></li>
+                    <li><a href="#">Liên hệ: 0931987215</a></li>
                 </ul>
             </div>
 

@@ -14,12 +14,16 @@ use App\Models\movie;
 use App\Models\show_time;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use App\Mail\invoice as MailInvoice;
+use App\Models\discount_use;
+use App\Models\seat;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
-
+use Illuminate\Support\Facades\Storage;
+use App\Models\Users;
 class VNPayController extends Controller
 {
-    
+
     public function showPaymentPage()
     {
         $ticket = session()->get('ticket');
@@ -28,7 +32,21 @@ class VNPayController extends Controller
         $cinema = cinema::findOrFail($cinema_room->cinema_id);
         $movie = movie::findOrFail($showtime->movie_id);
         $pricePerSeat = $movie->price;
-        $totalPrice = $pricePerSeat * count($ticket['seats']);
+        
+        $seatNames = [];
+        //$seatType = [];
+        $totalPrice = 0;
+        foreach ($ticket['seats'] as $seatId) {
+            $seat = Seat::find($seatId); // Tìm ghế theo ID
+            if ($seat) {
+                $seatNames[] = $seat->seat_name;
+                $seatType = $seat->seat_type;
+                $percen = $seatType->percentage;
+                $price = ($pricePerSeat *($percen/100));
+                $totalPrice += $price;
+            }
+        }
+        //dd($totalPrice);
         $data = [
             'showtime' => $showtime,
             'cinema_room' => $cinema_room,
@@ -36,7 +54,7 @@ class VNPayController extends Controller
             'movie' => $movie,
             'totalPrice' => $totalPrice,
         ];
-        return view('payments.payment_information', ['ticket' => $ticket, 'data' => $data]);
+        return view('payments.payment_information', ['ticket' => $ticket, 'data' => $data, 'seat' => $seatNames]);
     }
 
     public function payment(Request $request)
@@ -46,14 +64,32 @@ class VNPayController extends Controller
         $email = $request->input('email');
         $phone = $request->input('phone');
         $discount_code = $request->input('discount_code');
+        $user_id = $request->input('user_id');
+        $user_find = Users::where('user_email', $email)->first();
+        if($user_find!=null)
+        {
+            $user_id = $user_find->user_id;
+        }
+        //$user_id_find = 
+        //dd($user_id_find);
         $discountValue = 0;
         if ($request->input('discount_code')) {
             $discountCode = discount_code::where('code', $discount_code)->first();
             if (!$discountCode) {
                 return redirect()->back()->withErrors(['discount_code' => 'Mã giảm giá không hợp lệ!']);
             }
+            if (!$discountCode->isValid()) {
+                return redirect()->back()->withErrors(['discount_code' => 'Mã giảm giá đã hết hạn!']);
+            }
+            $discount_use = discount_use::where('user_id', $user_id)->where('discount_code_id',$discountCode->id)->exists();
+            if($discount_use)
+            {
+                return redirect()->back()->withErrors(['discount_code' => 'Mã giảm giá đã được sử dụng!']);
+            }
             $discountValue = $discountCode->discount_percentage;
+            $discount_code = $discountCode->id;
         }
+        
 
         // Xóa ghế đã hết hạn
         DB::table('reserved_seats')->where('expires_at', '<', now())->delete();
@@ -82,19 +118,18 @@ class VNPayController extends Controller
             $totalPrice -= ($totalPrice * $discountValue / 100);
         }
         DB::beginTransaction();
-        
+
         $invoiceData = [
             'invoice_id' => $invoiceId,
             'date_created' => now(),
             'email_kh' => $email,
             'phone_kh' => $phone,
-            'user_id' => null,
+            'user_id' => $user_id,
             'discount_code_id' => $discount_code,
             'seats' => $ticket['seats'],
             'showtime_id' => $ticket['showtime_id'],
             'total' => $totalPrice,
         ];
-        Cache::put('invoiceData', $invoiceData, now()->addMinutes(5));
         session()->put('invoiceData', $invoiceData);
         session()->save();
         $newExpiresAt = now()->addMinutes(5);
@@ -109,11 +144,14 @@ class VNPayController extends Controller
             return redirect()->back()->withErrors(['seats' => 'Một hoặc nhiều ghế đã hết hạn sau khi cập nhật. Vui lòng chọn lại.']);
         }
         //dd(session()->all());
+        $invoiceFilePath = "temp_invoices/{$invoiceId}.json";
+        Storage::put($invoiceFilePath, json_encode($invoiceData));
         return $this->redirectToVnpay($invoiceId, $invoiceData);
     }
 
     public function redirectToVnpay($invoiceId, $arr)
     {
+        //dd(session()->all());
         date_default_timezone_set('Asia/Ho_Chi_Minh');
         $vnp_TxnRef = $invoiceId; // mã giao dịch
         $vnp_Amount = $arr['total']; // Số tiền thanh toán
@@ -159,16 +197,16 @@ class VNPayController extends Controller
             $vnpSecureHash =   hash_hmac('sha512', $hashdata, "K498EBPTORKXQUZYVW0HAQL9BUFW0BI8"); //  
             $vnp_Url .= 'vnp_SecureHash=' . $vnpSecureHash;
         }
-        
+
         return redirect($vnp_Url);
-        die();
+        // die();
     }
     public function VNPayResult(Request $request)
     {
-        //dd(session()->all());
+        //dd($request->session()->all());
         $inputData = $request->all();
         $vnp_HashSecret = config('services.vnpay.hash_secret');
-        
+
         // Kiểm tra chữ ký hợp lệ
         $secureHash = $inputData['vnp_SecureHash'];
         unset($inputData['vnp_SecureHash']);
@@ -191,62 +229,107 @@ class VNPayController extends Controller
 
                 DB::beginTransaction();
                 try {
-                    //$invoiceData = Cache::get('invoiceData');
-                    $invoiceData = session()->get('invoiceData');
-                    //dd($invoiceData);
+                    $invoiceFilePath = "temp_invoices/{$inputData['vnp_TxnRef']}.json";
+
+                    if (Storage::exists($invoiceFilePath)) {
+                        $invoiceData = json_decode(Storage::get($invoiceFilePath), true);
+                    }
                     $invoice = Invoice::create([
                         'invoice_id' => $invoiceData['invoice_id'],
                         'date_created' => now(),
                         'email_kh' => $invoiceData['email_kh'],
                         'phone_kh' => $invoiceData['phone_kh'],
-                        'user_id' => null,
+                        'user_id' => $invoiceData['user_id'],
                         'discount_code_id' => $invoiceData['discount_code_id'],
                         'price_total' => $invoiceData['total']
                     ]);
-
+                    if($invoice->user_id!=null && $invoice->discount_code_id!=null)
+                    {
+                        discount_use::create([
+                            'user_id' => $invoice->user_id,
+                            'discount_code_id' => $invoice->discount_code_id,
+                            'invoice_id' => $invoice->invoice_id
+                        ]);
+                    }
+                    
+                    $showtime = show_time::findOrFail($invoiceData['showtime_id']);
+                    $movie = $showtime->movie;
+                    $pricePerSeat = $movie->price;
+                    //dd($movie);
+                    $details = [];
                     foreach ($invoiceData['seats'] as $seatId) {
+                        $seat = Seat::find($seatId);
+                        $price = 0;
+                        if($seat)
+                        {
+                            $seatType = $seat->seat_type;
+                            $percen = $seatType->percentage;
+                            $price = ($pricePerSeat *($percen/100));
+                        }
                         $detail = invoice_detail::create([
                             'invoice_id' => $invoice->invoice_id,
                             'showtime_id' => $invoiceData['showtime_id'],
                             'seat_id' => $seatId,
-                            'price' => 100000
+                            'price' => $price
                         ]);
-                        //dd($invoiceData, $invoice->invoice_id, $detail);
+                        $details[] = $detail;
                     }
-                    $emailData = [
-                        'invoice' => $invoice,
-                        'invoiceDetails' => $detail,
-                    ];
+                    
+                    //dd($invoiceData, $details);
                     DB::commit();
-                    Mail::to($invoice->email_kh)->send(new \App\Mail\Invoice($emailData));
-                    session()->forget('ticket');
-                    session()->forget('invoiceData');
+                    $showtime = show_time::findOrFail($invoiceData['showtime_id']);
+                    try {
+                        Mail::to($invoice->email_kh)->send(new MailInvoice($invoice, $details, $showtime));
+                    } catch (\Exception $e) {
+                        Log::error('Email sending failed: ' . $e->getMessage());
+                    }
                 } catch (\Exception $e) {
                     DB::rollBack();
                     $errorMessage = $e->getMessage();
+                    //dd($errorMessage);
                     return view('payments.payment_return_infor', compact('inputData', 'errorMessage'));
                 }
-                
+                Storage::delete($invoiceFilePath);
+                session()->forget('ticket');
+                session()->forget('invoiceData');
                 return view('payments.payment_return_infor', compact('inputData'));
             } else if ($inputData['vnp_ResponseCode'] == '15') {
+                $invoiceFilePath = "temp_invoices/{$inputData['vnp_TxnRef']}.json";
+
+                if (Storage::exists($invoiceFilePath)) {
+                    Storage::delete($invoiceFilePath);
+                }
                 $errorMessage = 'Hết thời gian thanh toán';
                 session()->forget('ticket');
                 session()->forget('invoiceData');
                 DB::table('reserved_seats')->where('expires_at', '<', now())->delete();
                 return view('payments.payment_return_infor', compact('inputData', 'errorMessage'));
             } else if ($inputData['vnp_ResponseCode'] == '24') {
+                $invoiceFilePath = "temp_invoices/{$inputData['vnp_TxnRef']}.json";
+
+                if (Storage::exists($invoiceFilePath)) {
+                    Storage::delete($invoiceFilePath);
+                }
                 $errorMessage = 'Hủy thanh toán';
                 $ticket = session()->get('ticket');
-                DB::table('reserved_seats')
+                if($ticket!=null)
+                {
+                    DB::table('reserved_seats')
                     ->where('showtime_id', $ticket['showtime_id'])
                     ->whereIn('seat_id', $ticket['seats'])
                     ->delete();
+                }
+                
                 session()->forget('ticket');
                 session()->forget('invoiceData');
                 //DB::table('reserved_seats')->where('expires_at', '<', now())->delete();
                 return view('payments.payment_return_infor', compact('inputData', 'errorMessage'));
             } else {
-                // Thanh toán thất bại, xử lý lỗi
+                $invoiceFilePath = "temp_invoices/{$inputData['vnp_TxnRef']}.json";
+
+                if (Storage::exists($invoiceFilePath)) {
+                    Storage::delete($invoiceFilePath);
+                }
                 $errorMessage = 'Thanh toán thất bại.';
                 session()->forget('ticket');
                 session()->forget('invoiceData');

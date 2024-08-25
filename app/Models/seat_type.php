@@ -15,7 +15,7 @@ class seat_type extends Model
 
     protected $fillable = [
         'name',
-        'price',
+        'percentage',
     ];
     public function seat()
     {
